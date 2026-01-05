@@ -1,109 +1,228 @@
+// Copyright 2019 The Flutter team. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:window_size/window_size.dart';
+
+import 'src/basics/basics.dart';
+import 'src/misc/misc.dart';
 
 void main() {
-  runApp(const SystemApp());
+  setupWindow();
+  runApp(const AnimationSamples());
 }
 
-class SystemApp extends StatelessWidget {
-  const SystemApp({super.key});
+const double windowWidth = 480;
+const double windowHeight = 854;
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'SYSTEM',
-      theme: ThemeData.dark(),
-      home: const SystemHome(),
-    );
-  }
-}
-
-class SystemHome extends StatefulWidget {
-  const SystemHome({super.key});
-
-  @override
-  State<SystemHome> createState() => _SystemHomeState();
-}
-
-class _SystemHomeState extends State<SystemHome> {
-  int level = 1;
-  int exp = 0;
-  int dailyCompleted = 0;
-
-  void completeQuest() {
-    setState(() {
-      dailyCompleted++;
-      exp += 20;
-      if (exp >= 100) {
-        level++;
-        exp = 0;
-      }
+void setupWindow() {
+  if (!kIsWeb &&
+      (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    WidgetsFlutterBinding.ensureInitialized();
+    setWindowTitle('Animation Samples');
+    setWindowMinSize(const Size(windowWidth, windowHeight));
+    setWindowMaxSize(const Size(windowWidth, windowHeight));
+    getCurrentScreen().then((screen) {
+      setWindowFrame(
+        Rect.fromCenter(
+          center: screen!.frame.center,
+          width: windowWidth,
+          height: windowHeight,
+        ),
+      );
     });
   }
+}
+
+class Demo {
+  final String name;
+  final String route;
+  final WidgetBuilder builder;
+
+  const Demo({
+    required this.name,
+    required this.route,
+    required this.builder,
+  });
+}
+
+final basicDemos = [
+  Demo(
+    name: 'AnimatedContainer',
+    route: AnimatedContainerDemo.routeName,
+    builder: (context) => const AnimatedContainerDemo(),
+  ),
+  Demo(
+    name: 'PageRouteBuilder',
+    route: PageRouteBuilderDemo.routeName,
+    builder: (context) => const PageRouteBuilderDemo(),
+  ),
+  Demo(
+    name: 'Animation Controller',
+    route: AnimationControllerDemo.routeName,
+    builder: (context) => const AnimationControllerDemo(),
+  ),
+  Demo(
+    name: 'Tweens',
+    route: TweenDemo.routeName,
+    builder: (context) => const TweenDemo(),
+  ),
+  Demo(
+    name: 'AnimatedBuilder',
+    route: AnimatedBuilderDemo.routeName,
+    builder: (context) => const AnimatedBuilderDemo(),
+  ),
+  Demo(
+    name: 'Custom Tween',
+    route: CustomTweenDemo.routeName,
+    builder: (context) => const CustomTweenDemo(),
+  ),
+  Demo(
+    name: 'Tween Sequences',
+    route: TweenSequenceDemo.routeName,
+    builder: (context) => const TweenSequenceDemo(),
+  ),
+  Demo(
+    name: 'Fade Transition',
+    route: FadeTransitionDemo.routeName,
+    builder: (context) => const FadeTransitionDemo(),
+  ),
+];
+
+final miscDemos = [
+  Demo(
+    name: 'Expandable Card',
+    route: ExpandCardDemo.routeName,
+    builder: (context) => const ExpandCardDemo(),
+  ),
+  Demo(
+    name: 'Carousel',
+    route: CarouselDemo.routeName,
+    builder: (context) => CarouselDemo(),
+  ),
+  Demo(
+    name: 'Focus Image',
+    route: FocusImageDemo.routeName,
+    builder: (context) => const FocusImageDemo(),
+  ),
+  Demo(
+    name: 'Card Swipe',
+    route: CardSwipeDemo.routeName,
+    builder: (context) => const CardSwipeDemo(),
+  ),
+  Demo(
+    name: 'Flutter Animate',
+    route: FlutterAnimateDemo.routeName,
+    builder: (context) => const FlutterAnimateDemo(),
+  ),
+  Demo(
+    name: 'Repeating Animation',
+    route: RepeatingAnimationDemo.routeName,
+    builder: (context) => const RepeatingAnimationDemo(),
+  ),
+  Demo(
+    name: 'Spring Physics',
+    route: PhysicsCardDragDemo.routeName,
+    builder: (context) => const PhysicsCardDragDemo(),
+  ),
+  Demo(
+    name: 'AnimatedList',
+    route: AnimatedListDemo.routeName,
+    builder: (context) => const AnimatedListDemo(),
+  ),
+  Demo(
+    name: 'AnimatedPositioned',
+    route: AnimatedPositionedDemo.routeName,
+    builder: (context) => const AnimatedPositionedDemo(),
+  ),
+  Demo(
+    name: 'AnimatedSwitcher',
+    route: AnimatedSwitcherDemo.routeName,
+    builder: (context) => const AnimatedSwitcherDemo(),
+  ),
+  Demo(
+    name: 'Hero Animation',
+    route: HeroAnimationDemo.routeName,
+    builder: (context) => const HeroAnimationDemo(),
+  ),
+  Demo(
+    name: 'Curved Animation',
+    route: CurvedAnimationDemo.routeName,
+    builder: (context) => const CurvedAnimationDemo(),
+  ),
+];
+
+final router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomePage(),
+      routes: [
+        for (final demo in basicDemos)
+          GoRoute(
+            path: demo.route,
+            builder: (context, state) => demo.builder(context),
+          ),
+        for (final demo in miscDemos)
+          GoRoute(
+            path: demo.route,
+            builder: (context, state) => demo.builder(context),
+          ),
+      ],
+    ),
+  ],
+);
+
+class AnimationSamples extends StatelessWidget {
+  const AnimationSamples({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Animation Samples',
+      theme: ThemeData(colorSchemeSeed: Colors.deepPurple),
+      routerConfig: router,
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final headerStyle = Theme.of(context).textTheme.titleLarge;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SYSTEM'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('LEVEL $level',
-                style: const TextStyle(
-                    fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(value: exp / 100),
-            const SizedBox(height: 20),
-            const Text('DAILY QUEST',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            QuestTile(
-              title: '10 Push-ups',
-              onComplete: completeQuest,
-            ),
-            QuestTile(
-              title: 'Read 10 minutes',
-              onComplete: completeQuest,
-            ),
-            QuestTile(
-              title: 'No phone 1 hour',
-              onComplete: completeQuest,
-            ),
-            const Spacer(),
-            Text('Completed today: $dailyCompleted',
-                style: const TextStyle(color: Colors.grey)),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Animation Samples')),
+      body: ListView(
+        children: [
+          ListTile(title: Text('Basics', style: headerStyle)),
+          ...basicDemos.map((d) => DemoTile(demo: d)),
+          ListTile(title: Text('Misc', style: headerStyle)),
+          ...miscDemos.map((d) => DemoTile(demo: d)),
+        ],
       ),
     );
   }
 }
 
-class QuestTile extends StatelessWidget {
-  final String title;
-  final VoidCallback onComplete;
+class DemoTile extends StatelessWidget {
+  final Demo demo;
 
-  const QuestTile({
-    super.key,
-    required this.title,
-    required this.onComplete,
-  });
+  const DemoTile({required this.demo, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Text(title),
-        trailing: ElevatedButton(
-          onPressed: onComplete,
-          child: const Text('COMPLETE'),
-        ),
-      ),
+    return ListTile(
+      title: Text(demo.name),
+      onTap: () {
+        context.go('/${demo.route}');
+      },
     );
   }
 }
