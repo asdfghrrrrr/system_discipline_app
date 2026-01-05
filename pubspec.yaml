@@ -1,53 +1,34 @@
-name: samples
-description: A collection of samples for Dart and Flutter.
+name: flutter_module_using_plugin_android_view
+description: An example Flutter module that uses a plugin.
+version: 1.0.0+1
+resolution: workspace
 
 environment:
-  sdk: ^3.9.0-0
+  sdk: ^3.8.1-0
 
-workspace:
-  - add_to_app/android_view/flutter_module_using_plugin_android_view
-  - add_to_app/books/flutter_module_books
-  - add_to_app/fullscreen/flutter_module_fullscreen
-  - add_to_app/multiple_flutters/multiple_flutters_module
-  - add_to_app/plugin/flutter_module_using_plugin
-  - add_to_app/prebuilt_module/flutter_module
-  - analysis_defaults
-  - android_splash_screen
-  - animations
-  - asset_transformation
-  - background_isolate_channels
-  - code_sharing/client
-  - code_sharing/server
-  - code_sharing/shared
-  - compass_app/app
-  - compass_app/server
-  - context_menus
-  - date_planner
-  - deeplink_store_example
-  - desktop_photo_search/fluent_ui
-  - desktop_photo_search/material
-  - dynamic_theme
-  - form_app
-  - game_template
-  - gemini_tasks
-  - google_maps
-  - infinite_list
-  - ios_app_clip
-  - isolate_example
-  - material_3_demo
-  - navigation_and_routing
-  - pedometer
-  - pedometer/example
-  - place_tracker
-  - platform_channels
-  - platform_design
-  - platform_view_swift
-  - provider_counter
-  - provider_shopper
-  - simple_shader
-  - simplistic_calculator
-  - simplistic_editor
-  - testing_app
-  - tool
-  - web_embedding/element_embedding_demo
-  - web_embedding/ng-flutter/flutter
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.5
+  url_launcher: ^6.3.2
+  sensors_plus: ^6.1.1
+
+dev_dependencies:
+  analysis_defaults:
+    path: ../../../analysis_defaults
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  # This section identifies your Flutter project as a module meant for
+  # embedding in a native host app.  These identifiers should _not_ ordinarily
+  # be changed after generation - they are used to ensure that the tooling can
+  # maintain consistency when adding or modifying assets and plugins.
+  # They also do not have any bearing on your native host application's
+  # identifiers, which may be completely independent or the same as these.
+  module:
+    androidX: true
+    androidPackage: dev.flutter.example.flutter_module_using_plugin
+    iosBundleIdentifier: dev.flutter.example.flutterModuleUsingPlugin
